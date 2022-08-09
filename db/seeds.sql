@@ -1,4 +1,4 @@
-INSERT INTO department(name)
+INSERT INTO department (name)
 VALUES
 ('Front of House'), -- 1
 ('Back of House'), -- 2
@@ -6,7 +6,7 @@ VALUES
 ('Accounting'), -- 4
 ('Marketing'); -- 5
 
-INSERT INTO roles(title, salay, department_id)
+INSERT INTO roles (title, salary, department_id)
 VALUES
 ('General Manager', 150000, 1), -- 1
 ('Asst General Manager', 75000, 1), -- 2
