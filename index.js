@@ -18,6 +18,7 @@ const mainMenu = () => {
       type: "list",
       choices: [
         "View All Employees",
+        "View Employees by Manager",
         "View All Roles",
         "View All Departments",
         "Add Employee",
@@ -33,6 +34,11 @@ const mainMenu = () => {
         case "View All Employees":
           //function call for view all employees
           viewEmployees();
+          break;
+
+          //function call for viewing employee's manager
+        case "View Employees by Manager":
+          viewEmployeesManager();
           break;
 
         case "View All Roles":
@@ -67,11 +73,14 @@ const mainMenu = () => {
       }
     });
 };
-
 mainMenu();
+
 //async function to view all employees
 const viewEmployees = async () => {
-  const sql = `SELECT * FROM employees`;
+  const sql = `SELECT employees.id, first_name AS first, last_name AS last, department.name AS department, title, salary
+  FROM employees
+  LEFT JOIN roles ON role_id = roles.id
+  LEFT JOIN department ON roles.department_id = department.id;`;
   const dbconn = await db.query(sql);
   console.table(dbconn[0]);
 
@@ -79,9 +88,31 @@ const viewEmployees = async () => {
   mainMenu();
 };
 
+const viewEmployeesManager = async () => {
+  const mangSql = `SELECT * FROM employees WHERE manager_id is NULL`
+  const manager = await db.query(mangSql);
+  const empManagers = await inquirer.prompt ([
+    {
+      type: 'list',
+      name: 'chooseManager',
+      message: "Which manager's employees would you like to view?",
+      choices: manager[0].map((manager) => {
+        return {
+          name: manager.first_name + " " + manager.last_name
+        }
+      })
+    }
+  ])
+  const sql = `SELECT first_name, last_name FROM employees WHERE manager_id = ?`;
+  const dbconn = await db.query(sql, empManagers.chooseManager);
+  console.table(dbconn[0]);
+}
+
 //async function to view all Roles
 const viewRoles = async () => {
-  const sql = `SELECT * FROM roles`;
+  const sql = `SELECT roles.id, roles.title, name AS department, roles.salary
+  FROM roles
+  JOIN department ON department.id=roles.department_id;`;
   const dbconn = await db.query(sql);
   console.table(dbconn[0]);
 
@@ -91,7 +122,8 @@ const viewRoles = async () => {
 
 // async function to view all Departments
 const viewDepartments = async () => {
-  const sql = `SELECT * FROM department`;
+  const sql = `SELECT department.name AS department, department.id
+  FROM department;`;
   const dbconn = await db.query(sql);
   console.table(dbconn[0]);
 
@@ -184,12 +216,12 @@ const addEmployee = async () => {
 
 //function to add role, salary and department
 const addRole = async () => {
-  const sql = `SELECT * FROM departments`;
-  const departmentRole = await db.query(sql);
+  const depSql = `SELECT * FROM department`;
+  const departmentRole = await db.query(depSql);
   const newTitle = await inquirer.prompt([
     {
       type: "input",
-      name: "tiltleName",
+      name: "titleName",
       message: "Please input what the new role is.",
       //regular expression to deny everything other than lower case a-z uppercase A-Z and '
       validate: (titleNameInput) => {
@@ -235,6 +267,14 @@ const addRole = async () => {
       }),
     },
   ]);
+
+  const roleSql = `INSERT INTO roles (title, salary, department_id) VALUES (?,?,?)`;
+  //method to insert new role title,salary and id into database.
+  await db.query(roleSql, [
+    newTitle.titleName,
+    newTitle.roleSalary,
+    newTitle.departmentRole,
+  ]);
   //call to return to main menu
   mainMenu();
 };
@@ -279,7 +319,7 @@ const updateEmployee = async () => {
       choices: dbconn[0].map((employee) => {
         return {
           name:
-            employee.first_name + " " + employee.last_name + " " + employee.id,
+            employee.first_name + " " + employee.last_name
         };
       }),
     },
@@ -288,14 +328,30 @@ const updateEmployee = async () => {
       name: "changeEmp",
       message: "What updates are you making to employee?",
       choices: [
-        { name: "Update employee role", value: [0] },
+        { name: "Update Employee Role", value: [0] },
         { name: "Update manager", value: [1] },
       ],
     },
   ]);
-  if (updateEmp.changeEmp == 1) {
-    const sql = `SELECT * FROM employees WHERE manager_id IS NULL`;
-    const managers = await db.query(sql);
+  if (updateEmp.changeEmp == 0) {
+    const roleSql = `SELECT * FROM roles`;
+    const roles = await db.query(roleSql);
+    const allRoles = await inquirer.prompt([
+      {
+        type: "list",
+        name: "newRole",
+        message: "What is the employee's new role?",
+        choices: roles[0].map((role) => {
+          return {
+            name: role.title,
+          };
+        }),
+      },
+    ])
+    console.table(allRoles.newRole, updateEmp.empSelect)
+  } else if (updateEmp.changeEmp == 1) {
+    const mangSql = `SELECT * FROM employees WHERE manager_id IS NULL`;
+    const managers = await db.query(mangSql);
     const allManagers = await inquirer.prompt([
       {
         type: "list",
@@ -303,18 +359,16 @@ const updateEmployee = async () => {
         message: "Which manager should the employee now report to?",
         choices: managers[0].map((manager) => {
           return {
-            name:
-              manager.title +
-              " " +
-              manager.first_name +
-              " " +
-              manager.last_name,
-            // value: manager.id,
+            name: manager.first_name + " " + manager.last_name,
           };
         }),
       },
     ]);
   }
+ 
   // call to return to main menu
   mainMenu();
 };
+
+
+
