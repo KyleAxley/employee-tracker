@@ -4,15 +4,15 @@ const cfonts = require('cfonts');
 cfonts.say('Employee|Tracker', {
     font: 'chrome',
     align: 'center',
-    colors: ['red', 'blue'],
-    background: 'black',
-    letterSpacing: 6,
-    letterHeight: 1,
-    space: false,
-    maxLength: '0',
+    colors: ['red', 'white', 'blue'],
+    background: 'transparent',
+    letterSpacing: 5,
+    letterHeight: 20,
+    space: true,
+    maxLength: '10',
     gradient: false,
-    independetGradient: true,
-    transitionGradient: true,
+    independetGradient: false,
+    transitionGradient: false,
     env: 'node'
 });
 
