@@ -54,7 +54,7 @@ const mainMenu = () => {
           addRole();
           break;
         case "Add Department":
-          //function call
+          //function call to add new department
           addDepartment();
           break;
         case "Update Employee Role":
@@ -111,7 +111,7 @@ const addEmployee = async () => {
             type: 'input',
             name: 'firstName',
             message: "Please enter employee's first name:",
-            //regular expression to everything other than lower case a-z uppercase A-Z and '
+            //regular expression to deny everything other than lower case a-z uppercase A-Z and '
             validate: firstNameInput => {
                 if(firstNameInput && firstNameInput.length < 31 && firstNameInput.search(/[^a-zA-Z/-\s]/g) === -1) {
                     return true;
@@ -125,7 +125,7 @@ const addEmployee = async () => {
             type: 'input',
             name: 'lastName',
             message: "Please enter employee's last name:",
-            //regular expression to everything other than lower case a-z uppercase A-Z and '
+            //regular expression to deny everything other than lower case a-z uppercase A-Z and '
             validate: lastNameInput => {
                 if(lastNameInput && lastNameInput.length < 31 && lastNameInput.search(/[^a-zA-Z/-\s]/g) === -1) {
                     return true;
@@ -171,12 +171,12 @@ const addRole = async () => {
       type: "input",
       name: "tiltleName",
       message: "Please input what the new role is.",
-      //regular expression to everything other than lower case a-z uppercase A-Z and '
+      //regular expression to deny everything other than lower case a-z uppercase A-Z and '
       validate: (titleNameInput) => {
         if (titleNameInput && titleNameInput.length < 31 && titleNameInput.search(/[^a-zA-Z/-\s]/g) === -1) {
           return true;
         } else {
-          console.log(" is not a valid role please try again!");
+          console.log(" is not a valid entry for a role please try again!");
         }
         return false;
       },
@@ -185,11 +185,12 @@ const addRole = async () => {
       input: "input",
       name: "roleSalary",
       message: "Please input what the salary is for this role.",
+      //regular expression to deny everything other than 0-9'
       validate: roleSalaryInput => {
         if (roleSalaryInput && roleSalaryInput.length < 9 && roleSalaryInput.search(/[^0-9\.]/g) === -1) {
           return true;
         } else {
-          console.log(" is not a valid salary please enter try again!");
+          console.log(" is not a valid entry for a salary please try again!");
           return false;
         }
       },
@@ -210,6 +211,25 @@ const addRole = async () => {
   mainMenu();
 };
 
-const addDepartment = async () => {};
+const addDepartment = async () => {
+    const sql = `INSERT INTO department (name) VALUES (?)`;
+    const addDepart = await inquirer.prompt ([
+        {
+            type: 'input',
+            name: 'newDepartment',
+            message: 'What is the name of the new department being added?',
+            //regular expression to everything other than lower case a-z uppercase A-Z and '
+            validate: newDepartmentInput => {
+                if(newDepartmentInput && newDepartmentInput.length < 31 && newDepartmentInput.search(/[^a-zA-Z/-\s]/g) === -1) {
+                    return true;
+                } else {
+                    console.log(' Is not a valid entry for a department please try again!');
+                    return false;
+                }
+            }
+        },
+    ]);
+    mainMenu();
+};
 
 const updateEmployee = async () => {};
