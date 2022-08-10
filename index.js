@@ -46,11 +46,11 @@ const mainMenu = () => {
           break;
 
         case "Add Employee":
-          //function call
+          //function call for add new employee by first & last name, role, reporting too
           addEmployee();
           break;
         case "Add Role":
-          //function call
+          //function call for adding role, salary, department
           addRole();
           break;
         case "Add Department":
@@ -100,16 +100,78 @@ const viewDepartments = async () => {
   mainMenu();
 };
 
-const addEmployee = async () => {};
+//async function to add new employee by first & last name, role and if manager
+const addEmployee = async () => {
+    const sql = `SELECT * FROM employees, roles`;
+    const roles = await db.query(sql);
+    const managers = await db.query(sql);
 
+    const answers = await inquirer.prompt([
+        {
+            type: 'input',
+            name: 'firstName',
+            message: "Please enter employee's first name:",
+            //regular expression to everything other than lower case a-z uppercase A-Z and '
+            validate: firstNameInput => {
+                if(firstNameInput && firstNameInput.length < 31 && firstNameInput.search(/[^a-zA-Z/-\s]/g) === -1) {
+                    return true;
+                } else {
+                    console.log(" Is not a valid name! Names cannot contain symbols, numbers or exceed 30 characters.");
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'lastName',
+            message: "Please enter employee's last name:",
+            //regular expression to everything other than lower case a-z uppercase A-Z and '
+            validate: lastNameInput => {
+                if(lastNameInput && lastNameInput.length < 31 && lastNameInput.search(/[^a-zA-Z/-\s]/g) === -1) {
+                    return true;
+                } else {
+                    console.log(" Is not a valid name! Names cannot contain symbols, numbers or exceed 30 characters.");
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'list',
+            name: 'role_id',
+            message: "What is the new employee's role?",
+            choices: roles[0].map((role) => {
+                return {
+                    name: role.title,
+                    value: role.id
+                }
+            })
+        },
+        {
+            type: 'list',
+            name: 'manager_id',
+            message: "Who is the employee reporting to?",
+            choices: managers[0].map((manager) => {
+                return {
+                    name: manager.title + ' ' + manager.first_name  + ' ' +  manager.last_name,
+                    value: manager.id
+                }
+            })
+        }
+    ])
+    //call to return to main menu
+    mainMenu();
+};
+
+//function to add role, salary and department
 const addRole = async () => {
-  const sql = `SELECT * FROM department INSERT INTO roles (name, salary, department) VALUES (?, ?, ?) `;
+  const sql = `SELECT * FROM departments`;
   const departmentRole = await db.query(sql)
   const newTitle = await inquirer.prompt([
     {
       type: "input",
       name: "tiltleName",
       message: "Please input what the new role is.",
+      //regular expression to everything other than lower case a-z uppercase A-Z and '
       validate: (titleNameInput) => {
         if (titleNameInput && titleNameInput.length < 31 && titleNameInput.search(/[^a-zA-Z/-\s]/g) === -1) {
           return true;
@@ -144,6 +206,8 @@ const addRole = async () => {
       })
     },
   ]);
+  //call to return to main menu
+  mainMenu();
 };
 
 const addDepartment = async () => {};
