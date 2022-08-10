@@ -62,8 +62,7 @@ const mainMenu = () => {
           updateEmployee();
           break;
         case "Exit":
-          //function call
-
+          db.end();
           break;
       }
     });
@@ -102,70 +101,91 @@ const viewDepartments = async () => {
 
 //async function to add new employee by first & last name, role and if manager
 const addEmployee = async () => {
-    const sql = `SELECT * FROM employees, roles`;
-    const roles = await db.query(sql);
-    const managers = await db.query(sql);
+  const empSql = `SELECT * FROM employees WHERE manager_id is NULL`;
+  const managers = await db.query(empSql);
+  const roleSql = `SELECT * FROM roles`;
+  const roles = await db.query(roleSql);
 
-    const answers = await inquirer.prompt([
-        {
-            type: 'input',
-            name: 'firstName',
-            message: "Please enter employee's first name:",
-            //regular expression to deny everything other than lower case a-z uppercase A-Z and '
-            validate: firstNameInput => {
-                if(firstNameInput && firstNameInput.length < 31 && firstNameInput.search(/[^a-zA-Z/-\s]/g) === -1) {
-                    return true;
-                } else {
-                    console.log(" Is not a valid name! Names cannot contain symbols, numbers or exceed 30 characters.");
-                    return false;
-                }
-            }
-        },
-        {
-            type: 'input',
-            name: 'lastName',
-            message: "Please enter employee's last name:",
-            //regular expression to deny everything other than lower case a-z uppercase A-Z and '
-            validate: lastNameInput => {
-                if(lastNameInput && lastNameInput.length < 31 && lastNameInput.search(/[^a-zA-Z/-\s]/g) === -1) {
-                    return true;
-                } else {
-                    console.log(" Is not a valid name! Names cannot contain symbols, numbers or exceed 30 characters.");
-                    return false;
-                }
-            }
-        },
-        {
-            type: 'list',
-            name: 'role_id',
-            message: "What is the new employee's role?",
-            choices: roles[0].map((role) => {
-                return {
-                    name: role.title,
-                    value: role.id
-                }
-            })
-        },
-        {
-            type: 'list',
-            name: 'manager_id',
-            message: "Who is the employee reporting to?",
-            choices: managers[0].map((manager) => {
-                return {
-                    name: manager.title + ' ' + manager.first_name  + ' ' +  manager.last_name,
-                    value: manager.id
-                }
-            })
+  const answers = await inquirer.prompt([
+    {
+      type: "input",
+      name: "firstName",
+      message: "Please enter employee's first name:",
+      //regular expression to deny everything other than lower case a-z uppercase A-Z and '
+      validate: (firstNameInput) => {
+        if (
+          firstNameInput &&
+          firstNameInput.length < 31 &&
+          firstNameInput.search(/[^a-zA-Z/-\s]/g) === -1
+        ) {
+          return true;
+        } else {
+          console.log(
+            " Is not a valid name! Names cannot contain symbols, numbers or exceed 30 characters."
+          );
+          return false;
         }
-    ])
-    //call to return to main menu
-    mainMenu();
+      },
+    },
+    {
+      type: "input",
+      name: "lastName",
+      message: "Please enter employee's last name:",
+      //regular expression to deny everything other than lower case a-z uppercase A-Z and '
+      validate: (lastNameInput) => {
+        if (
+          lastNameInput &&
+          lastNameInput.length < 31 &&
+          lastNameInput.search(/[^a-zA-Z/-\s]/g) === -1
+        ) {
+          return true;
+        } else {
+          console.log(
+            " Is not a valid name! Names cannot contain symbols, numbers or exceed 30 characters."
+          );
+          return false;
+        }
+      },
+    },
+    {
+      type: "list",
+      name: "roleId",
+      message: "What is the new employee's role?",
+      choices: roles[0].map((role) => {
+        return {
+          name: role.title,
+          value: role.id,
+        };
+      }),
+    },
+    {
+      type: "list",
+      name: "managerId",
+      message: "Who is the employee reporting to?",
+      choices: managers[0].map((manager) => {
+        return {
+          name: manager.first_name + " " + manager.last_name,
+          value: manager.id,
+        };
+      }),
+    },
+  ]);
+  const sql = `INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)`;
+  //method to save new employee to database
+  await db.query(sql, [
+    answers.firstName,
+    answers.lastName,
+    answers.roleId,
+    answers.managerId,
+  ]);
+  //call to return to main menu
+  mainMenu();
 };
 
 //function to add role, salary and department
 const addRole = async () => {
   const sql = `SELECT * FROM departments`;
-  const departmentRole = await db.query(sql)
+  const departmentRole = await db.query(sql);
   const newTitle = await inquirer.prompt([
     {
       type: "input",
@@ -173,7 +193,11 @@ const addRole = async () => {
       message: "Please input what the new role is.",
       //regular expression to deny everything other than lower case a-z uppercase A-Z and '
       validate: (titleNameInput) => {
-        if (titleNameInput && titleNameInput.length < 31 && titleNameInput.search(/[^a-zA-Z/-\s]/g) === -1) {
+        if (
+          titleNameInput &&
+          titleNameInput.length < 31 &&
+          titleNameInput.search(/[^a-zA-Z/-\s]/g) === -1
+        ) {
           return true;
         } else {
           console.log(" is not a valid entry for a role please try again!");
@@ -186,8 +210,12 @@ const addRole = async () => {
       name: "roleSalary",
       message: "Please input what the salary is for this role.",
       //regular expression to deny everything other than 0-9'
-      validate: roleSalaryInput => {
-        if (roleSalaryInput && roleSalaryInput.length < 9 && roleSalaryInput.search(/[^0-9\.]/g) === -1) {
+      validate: (roleSalaryInput) => {
+        if (
+          roleSalaryInput &&
+          roleSalaryInput.length < 9 &&
+          roleSalaryInput.search(/[^0-9\.]/g) === -1
+        ) {
           return true;
         } else {
           console.log(" is not a valid entry for a salary please try again!");
@@ -201,10 +229,10 @@ const addRole = async () => {
       message: "Please input which department this new role will be in.",
       choices: departmentRole[0].map((department) => {
         return {
-            name: department.name,
-            value: department.id,
-        }
-      })
+          name: department.name,
+          value: department.id,
+        };
+      }),
     },
   ]);
   //call to return to main menu
@@ -212,24 +240,81 @@ const addRole = async () => {
 };
 
 const addDepartment = async () => {
-    const sql = `INSERT INTO department (name) VALUES (?)`;
-    const addDepart = await inquirer.prompt ([
-        {
-            type: 'input',
-            name: 'newDepartment',
-            message: 'What is the name of the new department being added?',
-            //regular expression to everything other than lower case a-z uppercase A-Z and '
-            validate: newDepartmentInput => {
-                if(newDepartmentInput && newDepartmentInput.length < 31 && newDepartmentInput.search(/[^a-zA-Z/-\s]/g) === -1) {
-                    return true;
-                } else {
-                    console.log(' Is not a valid entry for a department please try again!');
-                    return false;
-                }
-            }
-        },
-    ]);
-    mainMenu();
+  const sql = `INSERT INTO department (name) VALUES (?)`;
+  const addDepart = await inquirer.prompt([
+    {
+      type: "input",
+      name: "newDepartment",
+      message: "What is the name of the new department being added?",
+      //regular expression to everything other than lower case a-z uppercase A-Z and '
+      validate: (newDepartmentInput) => {
+        if (
+          newDepartmentInput &&
+          newDepartmentInput.length < 31 &&
+          newDepartmentInput.search(/[^a-zA-Z/-\s]/g) === -1
+        ) {
+          return true;
+        } else {
+          console.log(
+            " Is not a valid entry for a department please try again!"
+          );
+          return false;
+        }
+      },
+    },
+  ]);
+  //method to insert new department into table after question and validation pass
+  await db.query(sql, addDepart.newDepartment);
+  mainMenu();
 };
 
-const updateEmployee = async () => {};
+const updateEmployee = async () => {
+  const sql = `SELECT * FROM employees`;
+  const dbconn = await db.query(sql);
+  const updateEmp = await inquirer.prompt([
+    {
+      type: "list",
+      name: "empSelect",
+      message: "Who are you updating?",
+      choices: dbconn[0].map((employee) => {
+        return {
+          name:
+            employee.first_name + " " + employee.last_name + " " + employee.id,
+        };
+      }),
+    },
+    {
+      type: "list",
+      name: "changeEmp",
+      message: "What updates are you making to employee?",
+      choices: [
+        { name: "Update employee role", value: [0] },
+        { name: "Update manager", value: [1] },
+      ],
+    },
+  ]);
+  if (updateEmp.changeEmp == 1) {
+    const sql = `SELECT * FROM employees WHERE manager_id IS NULL`;
+    const managers = await db.query(sql);
+    const allManagers = await inquirer.prompt([
+      {
+        type: "list",
+        name: "chooseManager",
+        message: "Which manager should the employee now report to?",
+        choices: managers[0].map((manager) => {
+          return {
+            name:
+              manager.title +
+              " " +
+              manager.first_name +
+              " " +
+              manager.last_name,
+            // value: manager.id,
+          };
+        }),
+      },
+    ]);
+  }
+  // call to return to main menu
+  mainMenu();
+};
