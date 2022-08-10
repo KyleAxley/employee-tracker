@@ -4,18 +4,12 @@ const inquirer = require('inquirer');
 const db = require('./db/connection');
 //import for connection.table
 const cTable = require('console.table');
-//import for figlet
-const figlet = require('figlet');
+//import for cfonts from assets dir
+const cfonts = require('./assets/cfonts');
+//import for figlet from assets dir
+// const figlet = require('./assets/figlet');
 
-// figlet('Employee Tracker', function(err, data) {
-//     if(err) {
-//         console.log('something went wrong...');
-//         console.dir(err);
-//         return;
-//     }
-//     console.log(data)
-// });
-
+//Initial Questions
 const mainMenu = () => {
     inquirer
         .prompt({
@@ -37,35 +31,39 @@ const mainMenu = () => {
         .then((res) => {
             switch (res.initQuestion) {
                 case "View All Employees":
-                    //function call for employee
+                    //function call for view all employees
                     viewEmployees();
                     break;
-                case "View All Roles":
-                    //function call
-                    break;
-                    case "View All Departments":
-                    //function call
-                    
-                    break;
-                    case "Add Employee":
-                    //function call
 
+                case "View All Roles":
+                    //function call to view all roles
+                    viewRoles();
+                    break;
+
+                case "View All Departments":
+                    //function call to view all departments
+                    viewDepartments();
+                    break;
+
+                case "Add Employee":
+                    //function call
+                    addEmployee();
                     break;
                 case "Add Role":
                     //function call
-
+                    addRole();
                     break;
                 case "Add Department":
                     //function call
-
+                    addDepartment();
                     break;
                 case "Update Employee Role":
                     //function call
-
+                    updateEmployee();
                     break;
                 case "Exit":
                     //function call
-
+                    
                     break;
                 
                 
@@ -73,12 +71,45 @@ const mainMenu = () => {
         })
  
     }
-    mainMenu();
 
-    const viewEmployees = async () => {};
-    const viewRoles = async () => {};
-    const viewDepartments = async () => {};
+    mainMenu();
+    //async function to view all employees
+    const viewEmployees = async () => {
+        const sql =`SELECT * FROM employees`;
+        const dbconn = await db.query(sql);
+        console.table(dbconn[0]);
+
+        //call to return to main menu questions
+        mainMenu();
+    };
+
+    //async function to view all Roles
+    const viewRoles = async () => {
+        const sql = `SELECT * FROM roles`;
+        const dbconn = await db.query(sql);
+        console.table(dbconn[0]);
+        
+        //call to return to main menu questions
+        mainMenu();
+    };
+
+    // async function to view all Departments
+    const viewDepartments = async () => {
+        const sql = `SELECT * FROM department`;
+        const dbconn = await db.query(sql);
+        console.table(dbconn[0]);
+
+        //call to return to main menu questions
+        mainMenu();
+    };
+
     const addEmployee = async () => {};
+
     const addRole = async () => {};
+
     const addDepartment = async () => {};
+
     const updateEmployee = async () => {};
+
+
+
