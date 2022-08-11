@@ -1,7 +1,7 @@
 //import for cfonts
 const cfonts = require('cfonts');
 // alternative fotns console, block, simpleBlock, simple, 3d, simple3d, chrome(using), huge, shade, slick, grid, pallet, tiny
-cfonts.say('Employee|Tracker', {
+cfonts.say('Employee Tracker', {
     font: 'chrome',
     align: 'center',
     colors: ['red', 'white', 'blue'],
@@ -9,7 +9,7 @@ cfonts.say('Employee|Tracker', {
     letterSpacing: 5,
     letterHeight: 20,
     space: true,
-    maxLength: '10',
+    maxLength: '20',
     gradient: false,
     independetGradient: false,
     transitionGradient: false,

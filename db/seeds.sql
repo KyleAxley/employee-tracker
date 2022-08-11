@@ -24,6 +24,10 @@ VALUES
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
 VALUES
 ('Brenda', 'Clark', 1, NULL), -- GM
+('Rorden', 'Gamsey', 5, NULL), -- Executive Chef
+('Ashley', 'Brooks', 9, NULL), -- PD Director
+('Lauren', 'Smith', 11, NULL), -- Controller
+('Samantha', 'McDonald', 12, NULL ), -- Marketing Director 
 ('John', 'Wayne', 2, 1),  -- AGM
 ('Thomas', 'Dunn', 3, 1), -- Server
 ('Jim', 'Sanders', 3, 1),  -- Server
@@ -33,7 +37,6 @@ VALUES
 ('Beth', 'Baily', 4, 1),  -- Bartender
 ('Rico', 'Gonzalez', 4, 1),  -- Bartender
 ('Raven', 'Cooper', 4, 1),  -- Bartender
-('Rorden', 'Gamsey', 5, NULL), -- Executive Chef
 ('Kenneth', 'Bryant', 6, 2), -- Chef de Cuisine
 ('Amanda', 'Christian', 7, 2),  -- Sous Chef
 ('Raymond', 'Anderson', 8, 2),  -- Line Cook
@@ -41,7 +44,4 @@ VALUES
 ('Sondra', 'Clarence', 8, 2),  -- Line Cook
 ('Harold', 'Smith', 8, 2),  -- Line Cook
 ('Leroy', 'Jenkins', 8, 2),  -- Line Cook
-('Ashley', 'Brooks', 9, NULL), -- PD Director
-('Carl', 'Rogers', 10, 3), -- PD assistant
-('Lauren', 'Smith', 11, NULL), -- Controller
-('Samantha', 'McDonald', 12, NULL ); -- Marketing Director 
+('Carl', 'Rogers', 10, 3); -- PD assistant
