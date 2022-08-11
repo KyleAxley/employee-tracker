@@ -28,7 +28,7 @@ Once mySql is running you will want to create your database and populate it. You
 To run the application as is or after edits you simple need to "quit" out of mySql in your terminal and then run "node index" to start the application. Enjoy!!!
 
 ## Demo
-https://youtu.be/LFoeD2Foe7E
+[Employee Tracker.webm](https://user-images.githubusercontent.com/103543572/184052324-f8633493-0861-4419-8e8b-e95f35969c4f.webm)
 
 ## Lessons learned
 This challenge was at first seemed to be easy but as progession was made it increased in diffculty and there was definitely a couple "walk away" moments particulary with the update employee section, the view manager's employees and then the joins. W3schools was an absolute savior for this challenge. 
